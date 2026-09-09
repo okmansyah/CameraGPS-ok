@@ -1,0 +1,37 @@
+name: Build APK
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout kode
+        uses: actions/checkout@v4
+
+      - name: Extract project
+        run: unzip -o GPSCameraApp.zip -d .
+
+      - name: Setup JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          gradle-version: 8.4
+
+      - name: Build APK (debug)
+        working-directory: GPSCameraApp
+        run: gradle assembleDebug
+
+      - name: Upload hasil APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: KameraGPS-debug-apk
+          path: GPSCameraApp/app/build/outputs/apk/debug/*.apk
